@@ -1,17 +1,5 @@
-function parseHTMLQuestions() {
-  const questionElements = document.querySelectorAll('.question-data');
-  const questions = [];
-  questionElements.forEach(el => {
-    const qText = el.querySelector('.q').textContent.trim();
-    const opts = Array.from(el.querySelectorAll('.opt')).map(o => o.textContent.trim());
-    const ans = parseInt(el.getAttribute('data-answer'), 10);
-    questions.push({ question: qText, options: opts, answer: ans });
-  });
-  return questions;
-}
-
 let current = 0, selectedAnswers = [], quizLocked = [], correctCount = 0;
-let timer = 120;
+let timer = 1200; // Increased timer to 20 minutes (20 * 60 seconds)
 let timerStarted = false;
 let timerInterval;
 
@@ -24,20 +12,39 @@ const resetBtn = document.getElementById("resetBtn");
 const reportCard = document.getElementById("reportCard");
 const analysisCard = document.getElementById("analysisCard");
 const viewAnalysisBtn = document.getElementById("viewAnalysisBtn");
-const startBtn = document.getElementById("startBtn");
+const startBtn = document.getElementById("startBtn"); // This is the Start Test button in the middle
+const onlineTestBtn = document.getElementById("onlineTestBtn"); // This is the Online Test Series button on top right
+const questionNumberElement = document.getElementById("questionNumber"); // Get the question number display element
 
-const questions = parseHTMLQuestions();
+const questionElements = document.querySelectorAll(".question-data");
+const questions = [];
+
+questionElements.forEach((qEl) => {
+  const q = qEl.querySelector(".q").innerText;
+  const opts = Array.from(qEl.querySelectorAll(".opt")).map(el => el.innerText);
+  const correctIndex = parseInt(qEl.getAttribute("data-answer"));
+  questions.push({ question: q, options: opts, answer: correctIndex });
+});
+document.getElementById("questionBank").style.display = "none";
 
 function showQuestion(index) {
   const q = questions[index];
-  let html = `<div class='question'>Q${index + 1}: ${q.question}</div><div class='options'>`;
+  let html = `<div class='question'>${q.question}</div><div class='options'>`; // Removed Q${index + 1}: from here
+
   q.options.forEach((opt, i) => {
     let cls = "option";
-    if (selectedAnswers[index] === i && !quizLocked[index]) cls += " selected";
+    if (selectedAnswers[index] === i && !quizLocked[index]) {
+      cls += " selected";
+    }
     html += `<div class='${cls}' onclick='selectAnswer(${index}, ${i})'>${opt}</div>`;
   });
   html += `</div>`;
   quizDiv.innerHTML = html;
+
+  // Update question number text explicitly in the circular red button
+  if (questionNumberElement) {
+    questionNumberElement.textContent = `${index + 1}/${questions.length}`;
+  }
 }
 
 function selectAnswer(qIndex, aIndex) {
@@ -49,7 +56,7 @@ function selectAnswer(qIndex, aIndex) {
 function updateTimer() {
   let min = Math.floor(timer / 60);
   let sec = timer % 60;
-  timerDiv.textContent = `Time Left: ${min}:${sec < 10 ? '0' + sec : sec}`;
+  timerDiv.textContent = `🕛 ${min}:${sec < 10 ? '0' + sec : sec}`; // Changed "Time Left: " to "🕛 "
   timer--;
   if (timer < 0) {
     clearInterval(timerInterval);
@@ -97,7 +104,7 @@ function showAnalysis() {
     }
 
     let html = `<div class='analysis-box'>
-      <div><b>Q${i + 1}:</b> ${q.question}</div>`;
+  <div class="question-number">${i + 1}/${questions.length}</div> <div><b>${q.question}</b></div>`; // Removed Q${i + 1}: from here
     q.options.forEach((opt, j) => {
       let cls = "option";
       if (j === q.answer) cls += " correct";
@@ -120,7 +127,8 @@ startBtn.onclick = () => {
   if (!timerStarted) {
     timerInterval = setInterval(updateTimer, 1000);
     timerStarted = true;
-    startBtn.style.display = 'none';
+    startBtn.style.display = 'none'; // Hide Start Test button after it's clicked
+    // onlineTestBtn does not change visibility here, it remains visible
   }
 };
 
