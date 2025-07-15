@@ -94,12 +94,12 @@ function showAnalysis() {
   container.innerHTML = "";
   questions.forEach((q, i) => {
     const userAnswer = selectedAnswers[i];
-    let feedback = "You did not attempt this question ";
+    let feedback = " Question Not Attempt ";
     let feedbackClass = "not-attempted-feedback";
 
     if (userAnswer !== undefined) {
       const isCorrect = userAnswer === q.answer;
-      feedback = isCorrect ? "Your answer is correct " : "Your answer is wrong ";
+      feedback = isCorrect ? "Your Answer is Correct " : "Your Answer is Wrong ";
       feedbackClass = isCorrect ? "correct-feedback" : "wrong-feedback";
     }
 
