@@ -112,8 +112,7 @@ function showAnalysis() {
       html += `<div class='${cls}'>${opt}</div>`;
     });
     html += `<div class='feedback ${feedbackClass}'>${feedback}</div>`;
-    html += `<div style='margin-top:5px;'>👉 Correct Answer : <b>${q.options[q.answer]}</b></div>`;
-    html += `</div>`;
+    
     container.innerHTML += html;
   });
 }
